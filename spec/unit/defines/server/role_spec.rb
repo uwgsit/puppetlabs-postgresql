@@ -175,4 +175,73 @@ describe 'postgresql::server::role', type: :define do
     it { is_expected.to compile.with_all_deps }
     it { is_expected.not_to contain_class('postgresql::server') }
   end
+
+  context 'Done encrypt for password which is md5' do
+    let :params do
+      {
+        password_hash: 'new-pa$s',
+        connect_settings: { 'PGHOST'     => 'postgres-db-server',
+                            'DBVERSION'  => '9.6',
+                            'PGUSER'     => 'login-user',
+                            'PGPASSWORD' => 'md5-EF13A33B6EB82392C5CE0F31FB6C8EB4' },
+      }
+    end
+
+    let :pre_condition do
+      "class {'postgresql::server':}"
+    end
+
+    it { is_expected.to contain_postgresql__server__role('test') }
+    it 'has create role for "test" user with password as ****' do
+      is_expected.to contain_postgresql_psql('CREATE ROLE test ENCRYPTED PASSWORD ****')
+        .with_command('Sensitive [value redacted]')
+        .with_sensitive('true')
+        .with_unless("SELECT 1 FROM pg_roles WHERE rolname = 'test'")
+        .with_port(5432)
+        .with_connect_settings('PGHOST' => 'postgres-db-server', 'DBVERSION' => '9.6', 'PGUSER' => 'login-user', 'PGPASSWORD' => 'md5-EF13A33B6EB82392C5CE0F31FB6C8EB4')
+        .that_requires('Class[postgresql::server::service]')
+    end
+    it 'has alter role for "test" user with password as ****' do
+      is_expected.to contain_postgresql_psql('ALTER ROLE test ENCRYPTED PASSWORD ****')
+        .with('command' => 'Sensitive [value redacted]', 'sensitive' => 'true',
+              'unless'  => 'Sensitive [value redacted]', 'port' => '5432',
+              'connect_settings' => { 'PGHOST' => 'postgres-db-server', 'DBVERSION' => '9.6',
+                                      'PGUSER' => 'login-user', 'PGPASSWORD' => 'md5-EF13A33B6EB82392C5CE0F31FB6C8EB4' })
+    end
+  end
+
+  context 'Dont encrypt for password which is SCRAM-SHA-256' do
+    let :params do
+      {
+        password_hash: 'new-pa$s',
+        connect_settings: { 'PGHOST'     => 'postgres-db-server',
+                            'DBVERSION'  => '9.6',
+                            'PGUSER'     => 'login-user',
+                            'PGPASSWORD' => 'SCRAM-SHA-256$-A350DA01441478DED714DFB6C97B7F0451A706DCCD54D0389872A3C3834B1E10' },
+      }
+    end
+
+    let :pre_condition do
+      "class {'postgresql::server':}"
+    end
+
+    it { is_expected.to contain_postgresql__server__role('test') }
+    it 'has create role for "test" user with password as ****' do
+      is_expected.to contain_postgresql_psql('CREATE ROLE test ENCRYPTED PASSWORD ****')
+        .with_command('Sensitive [value redacted]')
+        .with_sensitive('true')
+        .with_unless("SELECT 1 FROM pg_roles WHERE rolname = 'test'")
+        .with_port(5432)
+        .with_connect_settings('PGHOST' => 'postgres-db-server', 'DBVERSION' => '9.6', 'PGUSER' => 'login-user', 'PGPASSWORD' => 'SCRAM-SHA-256$-A350DA01441478DED714DFB6C97B7F0451A706DCCD54D0389872A3C3834B1E10')
+        .that_requires('Class[postgresql::server::service]')
+    end
+    it 'has alter role for "test" user with password as ****' do
+      is_expected.to contain_postgresql_psql('ALTER ROLE test ENCRYPTED PASSWORD ****')
+        .with('command' => 'Sensitive [value redacted]', 'sensitive' => 'true',
+              'unless'  => 'Sensitive [value redacted]', 'port' => '5432',
+              'connect_settings' => { 'PGHOST' => 'postgres-db-server', 'DBVERSION' => '9.6',
+                                      'PGUSER' => 'login-user', 'PGPASSWORD' => 'SCRAM-SHA-256$-A350DA01441478DED714DFB6C97B7F0451A706DCCD54D0389872A3C3834B1E10' })
+    end
+  end
+
 end
