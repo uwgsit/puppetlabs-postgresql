@@ -199,6 +199,9 @@ class postgresql::server (
     require => Class['postgresql::server::install'],
   }
 
+  # DEBUG
+  notify { "postgresql::server service_enable = ${service_enable} service_ensure = ${service_ensure}": }
+
   contain postgresql::server::install
   contain postgresql::server::initdb
   contain postgresql::server::config
