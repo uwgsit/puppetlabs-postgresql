@@ -200,7 +200,7 @@ class postgresql::server (
   }
 
   # DEBUG
-  notify { "postgresql::server service_enable = ${service_enable} service_ensure = ${service_ensure}": }
+  notify { "postgresql::server service_enable = ${service_enable} service_ensure = ${service_ensure} service_manage = ${service_manage} service_name = ${service_name}": }
 
   contain postgresql::server::install
   contain postgresql::server::initdb

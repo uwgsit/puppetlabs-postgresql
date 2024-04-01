@@ -1,5 +1,7 @@
 # @api private
 class postgresql::server::service {
+  # DEBUG
+  notify { "postgresql::server::service service_ensure = ${postgresql::server::service_ensure} service_enable = ${postgresql::server::service_enable} service_manage = ${postgresql::server::service_manage} service_name = ${postgresql::server::service_name}": }
   postgresql::server::instance::service { 'main':
     service_ensure   => $postgresql::server::service_ensure,
     service_enable   => $postgresql::server::service_enable,
