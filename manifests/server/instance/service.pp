@@ -33,7 +33,7 @@ define postgresql::server::instance::service (
   anchor { "postgresql::server::service::begin::${name}": }
 
   # DEBUG
-  notify { "postgresql::server::instance::service[${name}] service_ensure = ${service_ensure} service_enable = ${service_enable} service_name = ${service_name} service_status = ${service_status}": }
+  notify { "postgresql::server::instance::service[${name}] service_ensure = ${service_ensure} service_enable = ${service_enable} service_name = ${service_name} service_status = ${service_status} service_manage = ${service_manage}": }
 
   if $service_manage {
     service { "postgresqld_instance_${name}":
